@@ -1,7 +1,9 @@
 package io.greenthumb.auth.controller;
 
+import io.greenthumb.auth.dto.RegisterIn;
 import io.greenthumb.auth.service.AuthService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,6 +24,18 @@ import java.util.Map;
 public class AuthController {
 
     private final AuthService authService;
+
+    /**
+     * Registration endpoint — creates a new user via account-service and returns a JWT.
+     *
+     * @param body JSON with {@code name}, {@code email}, and {@code password}.
+     * @return 201 with {@code {"token": "..."}} or 409 if email is already registered.
+     */
+    @PostMapping("/register")
+    public ResponseEntity<Map<String, String>> register(@RequestBody RegisterIn body) {
+        String token = authService.register(body.name(), body.email(), body.password());
+        return ResponseEntity.status(HttpStatus.CREATED).body(Map.of("token", token));
+    }
 
     /**
      * Login endpoint.
